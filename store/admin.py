@@ -3,6 +3,8 @@ from typing import Any
 from django.contrib import admin
 from django.db.models.query import QuerySet
 from django.http import HttpRequest
+from django.urls import reverse
+from django.utils.html import format_html, urlencode
 from . import models
 
 
@@ -22,7 +24,16 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(models.Collection)
 class CollectionAdmin(admin.ModelAdmin):
-    list_display = ['title']
+    list_display = ['title', 'link']
+
+    @admin.display(ordering='link')
+    def link(self, collection):
+        url = (reverse('admin:store_product_changelist')
+               + '?'
+               + urlencode({
+                   'collection__id': str(collection.id)
+               }))
+        return format_html('<a href="{}">{}</a>', url, collection.title)
 
     # def products_count(self, collection):
     #     return collection.products_count
