@@ -1,6 +1,6 @@
 from itertools import count
 from typing import Any
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.db.models.query import QuerySet
 from django.http import HttpRequest
 from django.urls import reverse
@@ -24,6 +24,7 @@ class inventoryFilter(admin.SimpleListFilter):
 
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
+    actions = ['clear_inventory']
     list_display = ['title', 'unit_price',
                     'inventory_status', 'collection']
     list_editable = ['unit_price']
@@ -35,6 +36,14 @@ class ProductAdmin(admin.ModelAdmin):
         if product.inventory < 10:
             return 'Low'
         return 'OK'
+
+    @admin.action(description='Clear Inventory')
+    def clear_inventory(self, request, queryset):
+        updated_count = queryset.update(inventory=0)
+        self.message_user(
+            request,
+            f'{updated_count} products were successfully cleared'
+        )
 
 
 @admin.register(models.Collection)
