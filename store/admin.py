@@ -1,4 +1,8 @@
+from itertools import count
+from typing import Any
 from django.contrib import admin
+from django.db.models.query import QuerySet
+from django.http import HttpRequest
 from . import models
 
 
@@ -16,7 +20,17 @@ class ProductAdmin(admin.ModelAdmin):
         return 'OK'
 
 
-admin.site.register(models.Collection)
+@admin.register(models.Collection)
+class CollectionAdmin(admin.ModelAdmin):
+    list_display = ['title']
+
+    # def products_count(self, collection):
+    #     return collection.products_count
+
+    # def get_queryset(self, request):
+    #     return super().get_queryset(request).annotate(
+    #         products_count=count('product')
+    #     )
 
 
 @admin.register(models.Customer)
