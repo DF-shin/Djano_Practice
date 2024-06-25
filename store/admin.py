@@ -8,11 +8,26 @@ from django.utils.html import format_html, urlencode
 from . import models
 
 
+class inventoryFilter(admin.SimpleListFilter):
+    title = 'inventory'
+    parameter_name = 'inventory'
+
+    def lookups(self, request, model_admin):
+        return [
+            ('<10', 'Low')
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == '<10':
+            return queryset.filter(inventory__lt=10)
+
+
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['title', 'unit_price',
                     'inventory_status', 'collection']
     list_editable = ['unit_price']
+    list_filter = ['collection', 'last_update', inventoryFilter]
     list_per_page = 10
 
     @admin.display(ordering='inventory')
